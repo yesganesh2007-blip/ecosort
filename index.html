@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EcoSort AI — E-Waste Disposal Guidance</title>
+<style>
+  /* ── Reset & base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:        #1a1c1e;
+    --surface:   #23262a;
+    --surface2:  #2c3036;
+    --border:    #383d44;
+    --text:      #e8eaed;
+    --muted:     #8b949e;
+    --copper:    #d4843a;
+    --copper-lt: #e8a05a;
+    --copper-dk: #a85e1f;
+    --green:     #3fb950;
+    --green-lt:  #56d364;
+    --green-bg:  rgba(63,185,80,.12);
+    --amber-bg:  rgba(212,132,58,.12);
+    --red:       #f85149;
+    --red-bg:    rgba(248,81,73,.12);
+    --blue:      #58a6ff;
+    --radius:    10px;
+    --shadow:    0 4px 24px rgba(0,0,0,.45);
+    --trans:     .18s ease;
+    --font-body: -apple-system,"Segoe UI",system-ui,sans-serif;
+    --font-head: Georgia,"Times New Roman",serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  /* light theme */
+  body.light {
+    --bg:       #f4f5f7;
+    --surface:  #ffffff;
+    --surface2: #eef0f3;
+    --border:   #d0d5dc;
+    --text:     #1a1c1e;
+    --muted:    #57606a;
+    --shadow:   0 4px 24px rgba(0,0,0,.12);
+  }
+  a { color: var(--copper); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1,h2,h3,h4 { font-family: var(--font-head); line-height:1.25; }
+  img { max-width:100%; }
+  button { cursor: pointer; font-family: var(--font-body); }
+  :focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+
+  /* ── Scrollbar ───────────────────────────────────────────── */
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius:3px; }
+
+  /* ── Utility ─────────────────────────────────────────────── */
+  .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+  .container { max-width:1100px; margin:0 auto; padding:0 20px; }
+  .section { padding: 72px 0 56px; }
+  .section-title {
+    font-size: 1.75rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .section-subtitle { color: var(--muted); margin-bottom: 40px; }
+  .pill {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:600;
+    letter-spacing:.03em; white-space:nowrap;
+  }
+  .pill-copper  { background:rgba(212,132,58,.18); color:var(--copper-lt); }
+  .pill-green   { background:var(--green-bg);  color:var(--green-lt);  }
+  .pill-red     { background:var(--red-bg);    color:var(--red);       }
+  .pill-blue    { background:rgba(88,166,255,.15); color:var(--blue);  }
+  .pill-muted   { background:var(--surface2);  color:var(--muted);     }
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 22px; border-radius:8px; border:none; font-size:.95rem; font-weight:600;
+    transition: transform var(--trans), box-shadow var(--trans), filter var(--trans);
+    letter-spacing:.02em;
+  }
+  .btn:hover  { filter:brightness(1.12); transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,0,0,.3); }
+  .btn:active { transform:translateY(0) scale(.97); box-shadow:none; filter:brightness(.95); }
+  .btn-primary { background: linear-gradient(135deg,var(--copper),var(--copper-dk)); color:#fff; }
+  .btn-ghost   { background: transparent; border:1px solid var(--border); color:var(--text); }
+  .btn-ghost:hover { border-color:var(--copper); color:var(--copper); }
+  .btn-sm { padding:7px 14px; font-size:.85rem; border-radius:6px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  /* ── Toast ───────────────────────────────────────────────── */
+  #toast-container {
+    position:fixed; bottom:28px; right:24px; z-index:9999;
+    display:flex; flex-direction:column; gap:8px; pointer-events:none;
+  }
+  .toast {
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); padding:10px 18px; border-radius:8px;
+    font-size:.88rem; box-shadow:var(--shadow);
+    opacity:0; transform:translateY(12px);
+    transition: opacity .25s, transform .25s;
+    pointer-events:auto;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+
+  /* ── Navbar ──────────────────────────────────────────────── */
+  #navbar {
+    position:sticky; top:0; z-index:100;
+    background: rgba(26,28,30,.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom:1px solid var(--border);
+    transition: background var(--trans);
+  }
+  body.light #navbar { background: rgba(244,245,247,.88); }
+  .nav-inner {
+    display:flex; align-items:center; gap:16px;
+    height:60px;
+  }
+  .nav-brand {
+    display:flex; align-items:center; gap:9px;
+    font-family:var(--font-head); font-size:1.2rem; font-weight:700;
+    color:var(--text); white-space:nowrap;
+  }
+  .nav-brand-icon { font-size:1.4rem; }
+  .nav-links {
+    display:flex; align-items:center; gap:4px;
+    list-style:none; margin-left:auto;
+  }
+  .nav-links a {
+    display:block; padding:6px 12px; border-radius:6px;
+    color:var(--muted); font-size:.88rem; font-weight:500;
+    transition: color var(--trans), background var(--trans);
+  }
+  .nav-links a:hover { color:var(--text); background:var(--surface2); text-decoration:none; }
+  .nav-right { display:flex; align-items:center; gap:10px; margin-left:12px; }
+  .status-dot {
+    width:9px; height:9px; border-radius:50%;
+    background:var(--muted); flex-shrink:0;
+    transition: background .4s;
+  }
+  .status-dot.online  { background:var(--green); box-shadow:0 0 6px var(--green); }
+  .status-dot.offline { background:var(--red); }
+  .status-label { font-size:.78rem; color:var(--muted); }
+  .theme-btn {
+    background:none; border:1px solid var(--border); color:var(--text);
+    width:34px; height:34px; border-radius:8px; font-size:1rem;
+    display:flex; align-items:center; justify-content:center;
+    transition: border-color var(--trans), background var(--trans);
+  }
+  .theme-btn:hover { border-color:var(--copper); background:var(--surface2); }
+  .hamburger {
+    display:none; background:none; border:1px solid var(--border);
+    color:var(--text); width:34px; height:34px; border-radius:8px;
+    align-items:center; justify-content:center; font-size:1.15rem;
+  }
+  @media(max-width:700px) {
+    .nav-links { display:none; position:absolute; top:60px; left:0; right:0;
+      background:var(--surface); border-bottom:1px solid var(--border);
+      flex-direction:column; padding:8px; gap:2px; }
+    .nav-links.open { display:flex; }
+    .hamburger { display:flex; }
+  }
+
+  /* ── Hero ────────────────────────────────────────────────── */
+  #hero {
+    padding: 80px 0 64px;
+    text-align:center;
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(212,132,58,.08) 0%, transparent 70%);
+  }
+  #hero h1 {
+    font-size: clamp(2rem,5vw,3.2rem);
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  #hero h1 span { color: var(--copper); }
+  #hero p {
+    font-size: clamp(.95rem,2vw,1.15rem);
+    color: var(--muted);
+    max-width: 580px;
+    margin: 0 auto 12px;
+  }
+  .sdg-badges { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
+  .session-counter {
+    margin-top:20px; font-size:.82rem; color:var(--muted);
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface); padding:5px 14px; border-radius:20px; border:1px solid var(--border);
+  }
+  .session-counter span { color:var(--copper); font-weight:700; }
+
+  /* ── Mode tabs ───────────────────────────────────────────── */
+  #mode-tabs {
+    display:flex; gap:0; background:var(--surface2);
+    border-radius:10px; padding:4px; width:fit-content; margin:0 auto 32px;
+    border:1px solid var(--border);
+  }
+  .mode-tab {
+    padding:8px 22px; border-radius:7px; border:none;
+    background:transparent; color:var(--muted); font-size:.9rem; font-weight:600;
+    transition: background var(--trans), color var(--trans);
+  }
+  .mode-tab.active { background:var(--surface); color:var(--text); box-shadow:0 1px 6px rgba(0,0,0,.25); }
+  .mode-panel { display:none; }
+  .mode-panel.active { display:block; }
+
+  /* ── Analyzer ────────────────────────────────────────────── */
+  #analyzer-section { padding-top:0; }
+  .analyzer-box {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px;
+  }
+  .input-row {
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  .input-row input[type="text"] {
+    flex:1; min-width:200px;
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); border-radius:8px; padding:11px 16px; font-size:1rem;
+    transition: border-color var(--trans), box-shadow var(--trans);
+  }
+  .input-row input[type="text"]:focus {
+    border-color:var(--copper); box-shadow:0 0 0 3px rgba(212,132,58,.18); outline:none;
+  }
+  .upload-label {
+    display:flex; align-items:center; justify-content:center;
+    width:44px; height:44px; border-radius:8px;
+    border:1px dashed var(--border); cursor:pointer;
+    color:var(--muted); font-size:1.2rem; flex-shrink:0;
+    transition: border-color var(--trans), color var(--trans);
+  }
+  .upload-label:hover { border-color:var(--copper); color:var(--copper); }
+  #img-preview-wrap {
+    display:none; position:relative; flex-shrink:0;
+  }
+  #img-preview {
+    width:44px; height:44px; border-radius:6px; object-fit:cover;
+    border:1px solid var(--border);
+  }
+  .remove-img {
+    position:absolute; top:-7px; right:-7px;
+    width:18px; height:18px; border-radius:50%; background:var(--red);
+    color:#fff; font-size:.65rem; border:none; display:flex;
+    align-items:center; justify-content:center; line-height:1;
+  }
+  /* drag over */
+  .analyzer-box.drag-over { border-color:var(--copper); background: rgba(212,132,58,.05); }
+
+  /* follow-up fields */
+  .followup-row {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;
+    margin-top:14px;
+  }
+  .followup-row label { font-size:.82rem; color:var(--muted); display:block; margin-bottom:4px; }
+  .followup-row select, .followup-row input {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); border-radius:7px; padding:8px 12px; font-size:.88rem;
+  }
+  .followup-row select:focus, .followup-row input:focus {
+    border-color:var(--copper); outline:none;
+  }
+
+  .example-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .chip {
+    padding:5px 13px; border-radius:20px;
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--muted); font-size:.82rem; cursor:pointer;
+    transition: border-color var(--trans), color var(--trans), background var(--trans);
+  }
+  .chip:hover { border-color:var(--copper); color:var(--copper); background: rgba(212,132,58,.07); }
+
+  /* empty state */
+  #empty-state {
+    text-align:center; padding:48px 20px; color:var(--muted);
+  }
+  #empty-state .empty-icon { font-size:3rem; margin-bottom:12px; opacity:.5; }
+  #empty-state p { font-size:.93rem; }
+
+  /* result card */
+  #result-card { display:none; margin-top:24px; }
+  .result-header {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    flex-wrap:wrap; gap:12px; margin-bottom:20px;
+  }
+  .result-category { font-size:1.4rem; font-family:var(--font-head); }
+  .result-badges { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .hazard-badge {
+    padding:4px 12px; border-radius:20px; font-size:.8rem; font-weight:700;
+    letter-spacing:.04em;
+  }
+  .hazard-high   { background:var(--red-bg); color:var(--red); }
+  .hazard-medium { background:var(--amber-bg); color:var(--copper-lt); }
+  .hazard-low    { background:var(--green-bg); color:var(--green-lt); }
+  .hazard-none   { background:var(--surface2); color:var(--muted); }
+  .result-action {
+    display:flex; align-items:center; gap:8px; margin-bottom:16px;
+    font-size:.95rem; color:var(--text);
+  }
+  .result-action strong { color:var(--copper); }
+  .materials-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
+  .material-pill {
+    padding:3px 10px; border-radius:20px; font-size:.76rem; font-weight:600;
+    background: rgba(88,166,255,.12); color:var(--blue);
+  }
+  .info-block {
+    border-radius:8px; padding:14px 16px; margin-bottom:12px; font-size:.9rem;
+  }
+  .info-block.amber { background:var(--amber-bg); border-left:3px solid var(--copper); }
+  .info-block.green { background:var(--green-bg); border-left:3px solid var(--green); }
+  .info-block ul { margin-left:18px; margin-top:6px; }
+  .info-block li { margin-bottom:4px; }
+  .disclaimer {
+    font-size:.78rem; color:var(--muted); margin-top:14px;
+    padding:10px 14px; background:var(--surface2); border-radius:7px;
+    border:1px solid var(--border);
+  }
+  .result-source {
+    font-size:.72rem; color:var(--muted); margin-top:8px; text-align:right;
+  }
+
+  /* skeleton */
+  .skeleton-wrap { margin-top:24px; }
+  .skeleton-line {
+    background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+    background-size:200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius:6px; margin-bottom:10px;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ── Category grid ───────────────────────────────────────── */
+  .category-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px;
+  }
+  .cat-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:20px 16px; text-align:center;
+    cursor:pointer;
+    transition: border-color var(--trans), transform var(--trans), box-shadow var(--trans);
+  }
+  .cat-card:hover {
+    border-color:var(--copper); transform:translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  }
+  .cat-card:active { transform:translateY(0) scale(.97); }
+  .cat-icon { font-size:2.2rem; margin-bottom:10px; }
+  .cat-name { font-size:.9rem; font-weight:600; margin-bottom:6px; }
+
+  /* ── Chatbot ─────────────────────────────────────────────── */
+  .chat-panel {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); display:flex; flex-direction:column;
+    height:520px; overflow:hidden;
+  }
+  .chat-header {
+    padding:14px 18px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface2);
+  }
+  .chat-avatar { font-size:1.4rem; }
+  .chat-header-text strong { font-size:.95rem; }
+  .chat-header-text p { font-size:.78rem; color:var(--muted); }
+  #chat-log {
+    flex:1; overflow-y:auto; padding:18px; display:flex;
+    flex-direction:column; gap:14px;
+  }
+  .msg { display:flex; gap:10px; max-width:85%; }
+  .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+  .msg-bubble {
+    padding:10px 14px; border-radius:12px; font-size:.9rem; line-height:1.55;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .msg.bot .msg-bubble {
+    background:var(--surface2); border:1px solid var(--border);
+    border-bottom-left-radius:3px;
+  }
+  .msg.user .msg-bubble {
+    background: linear-gradient(135deg,var(--copper),var(--copper-dk));
+    color:#fff; border-bottom-right-radius:3px;
+  }
+  .msg-icon { font-size:1.4rem; flex-shrink:0; margin-top:2px; }
+  /* typing dots */
+  .typing-dots { display:flex; gap:5px; align-items:center; padding:4px 0; }
+  .typing-dots span {
+    width:7px; height:7px; border-radius:50%; background:var(--muted);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay:.2s; }
+  .typing-dots span:nth-child(3) { animation-delay:.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+  .chat-input-row {
+    padding:12px 14px; border-top:1px solid var(--border);
+    display:flex; gap:8px; background:var(--surface);
+  }
+  #chat-input {
+    flex:1; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); border-radius:8px; padding:9px 14px; font-size:.92rem;
+    resize:none; font-family:var(--font-body);
+    transition: border-color var(--trans);
+  }
+  #chat-input:focus { border-color:var(--copper); outline:none; }
+  .send-btn {
+    background: linear-gradient(135deg,var(--copper),var(--copper-dk));
+    color:#fff; border:none; border-radius:8px;
+    width:42px; height:42px; font-size:1.1rem; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    transition: filter var(--trans), transform var(--trans);
+  }
+  .send-btn:hover { filter:brightness(1.12); transform:scale(1.05); }
+  .send-btn:active { transform:scale(.95); }
+
+  /* ── Tools ───────────────────────────────────────────────── */
+  .tools-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+
+  /* Repair calculator */
+  .tool-card { position:relative; }
+  .tool-card h3 { font-family:var(--font-body); font-size:1rem; font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+  .tool-card p.desc { font-size:.83rem; color:var(--muted); margin-bottom:16px; }
+  .tool-card label { font-size:.82rem; color:var(--muted); display:block; margin-bottom:4px; }
+  .tool-card select, .tool-card input[type="number"] {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); border-radius:7px; padding:8px 12px; font-size:.9rem; margin-bottom:12px;
+  }
+  .tool-card select:focus, .tool-card input[type="number"]:focus { border-color:var(--copper); outline:none; }
+  .tool-result {
+    margin-top:12px; padding:12px 14px; border-radius:8px; font-size:.88rem;
+    display:none;
+  }
+  .tool-result.show { display:block; }
+  .tool-result.good { background:var(--green-bg); border-left:3px solid var(--green); }
+  .tool-result.bad  { background:var(--red-bg); border-left:3px solid var(--red); }
+  .tool-result.neutral { background:var(--amber-bg); border-left:3px solid var(--copper); }
+
+  /* ── Drop-off section ────────────────────────────────────── */
+  .channels-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-bottom:32px; }
+  .channel-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:18px;
+  }
+  .channel-icon { font-size:1.8rem; margin-bottom:8px; }
+  .channel-card h4 { font-size:.95rem; font-weight:700; margin-bottom:4px; }
+  .channel-card p  { font-size:.83rem; color:var(--muted); margin-bottom:8px; }
+  .channel-accepts { font-size:.78rem; color:var(--muted); }
+  .channel-accepts strong { color:var(--text); }
+  .locator-box {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:24px; max-width:540px;
+  }
+  .locator-box h3 { font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .locator-box p  { font-size:.85rem; color:var(--muted); margin-bottom:14px; }
+  .locator-input-row { display:flex; gap:8px; }
+  .locator-input-row input {
+    flex:1; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); border-radius:8px; padding:9px 14px; font-size:.9rem;
+  }
+  .locator-input-row input:focus { border-color:var(--copper); outline:none; }
+  #locator-msg { margin-top:12px; font-size:.85rem; color:var(--muted); display:none; }
+
+  /* ── How it works ────────────────────────────────────────── */
+  .how-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .how-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:20px;
+  }
+  .how-num {
+    width:30px; height:30px; border-radius:50%;
+    background: linear-gradient(135deg,var(--copper),var(--copper-dk));
+    color:#fff; font-weight:700; font-size:.85rem;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:10px;
+  }
+  .how-card h4 { font-size:.93rem; font-weight:700; margin-bottom:6px; }
+  .how-card p  { font-size:.83rem; color:var(--muted); }
+
+  /* ── Responsible AI ──────────────────────────────────────── */
+  .rai-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; }
+  .rai-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:18px;
+  }
+  .rai-card h4 { font-size:.9rem; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:7px; }
+  .rai-card p  { font-size:.82rem; color:var(--muted); }
+
+  /* ── Certificate modal ───────────────────────────────────── */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; z-index:500;
+    background:rgba(0,0,0,.65); align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:32px; max-width:520px; width:100%;
+    position:relative; box-shadow:var(--shadow);
+  }
+  .modal h3 { font-size:1.2rem; margin-bottom:20px; }
+  .cert-row { display:flex; justify-content:space-between; padding:8px 0;
+    border-bottom:1px solid var(--border); font-size:.9rem; }
+  .cert-row:last-child { border-bottom:none; }
+  .cert-label { color:var(--muted); }
+  .modal-close {
+    position:absolute; top:14px; right:14px;
+    background:none; border:none; color:var(--muted); font-size:1.3rem; line-height:1;
+    transition: color var(--trans);
+  }
+  .modal-close:hover { color:var(--text); }
+  .modal-actions { margin-top:20px; display:flex; gap:10px; }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  footer {
+    margin-top:64px; border-top:1px solid var(--border);
+    padding:32px 0 24px; color:var(--muted); font-size:.82rem;
+  }
+  .footer-inner { display:flex; flex-wrap:wrap; gap:24px; justify-content:space-between; align-items:flex-start; }
+  .footer-brand { font-family:var(--font-head); font-size:1.05rem; color:var(--text); margin-bottom:6px; }
+  .footer-disclaimer {
+    margin-top:20px; padding-top:16px; border-top:1px solid var(--border);
+    font-size:.78rem; color:var(--muted); text-align:center;
+  }
+
+  /* ── Print styles ────────────────────────────────────────── */
+  @media print {
+    #navbar, #hero, #mode-tabs, #analyzer-section, #categories-section,
+    #tools-section, #dropoff-section, #howitworks-section, #rai-section,
+    footer, .modal-actions, .modal-close { display:none !important; }
+    .modal-overlay { display:flex !important; position:static; background:none; padding:0; }
+    .modal { box-shadow:none; border:1px solid #ccc; }
+  }
+
+  @media(max-width:600px) {
+    .section { padding:48px 0 36px; }
+    .analyzer-box { padding:18px; }
+    .input-row { gap:8px; }
+    .chat-panel { height:420px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Toast container ─────────────────────────────────────── -->
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ── Certificate modal ──────────────────────────────────── -->
+<div id="cert-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cert-title">
+  <div class="modal">
+    <button class="modal-close" id="cert-close" aria-label="Close certificate">&#x2715;</button>
+    <h3 id="cert-title">♻ Disposal Record</h3>
+    <div id="cert-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print / Save as PDF</button>
+      <button class="btn btn-ghost" id="cert-close2">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Navbar ──────────────────────────────────────────────── -->
+<nav id="navbar" role="navigation" aria-label="Main navigation">
+  <div class="container nav-inner">
+    <a href="#" class="nav-brand" aria-label="EcoSort AI home">
+      <span class="nav-brand-icon">♻</span>
+      EcoSort AI
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#analyzer-section">Analyzer</a></li>
+      <li><a href="#categories-section">Categories</a></li>
+      <li><a href="#tools-section">Tools</a></li>
+      <li><a href="#dropoff-section">Drop-Off</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="status-dot" id="status-dot" title="Backend status"></div>
+      <span class="status-label" id="status-label">Checking…</span>
+      <button class="theme-btn" id="theme-btn" aria-label="Toggle dark/light theme">🌙</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────────── -->
+<header id="hero">
+  <div class="container">
+    <h1>Smarter E-Waste Decisions,<br><span>Powered by AI</span></h1>
+    <p>Classify any electronic item, get hazard ratings, disposal guidance, and chat with a Gemini-powered assistant — all in one place.</p>
+    <div class="sdg-badges">
+      <span class="pill pill-green">🌍 SDG 12 — Responsible Consumption</span>
+      <span class="pill pill-blue">🏙 SDG 11 — Sustainable Cities</span>
+    </div>
+    <div class="session-counter" id="session-counter">
+      ♻ <span id="session-count">0</span> items analyzed this session
+    </div>
+  </div>
+</header>
+
+<!-- ── Main ─────────────────────────────────────────────────── -->
+<main>
+  <div class="container">
+
+    <!-- Mode tabs -->
+    <div id="mode-tabs" role="tablist" aria-label="Main mode">
+      <button class="mode-tab active" id="tab-analyzer" role="tab" aria-selected="true"  aria-controls="panel-analyzer">🔍 Analyzer</button>
+      <button class="mode-tab"        id="tab-chat"     role="tab" aria-selected="false" aria-controls="panel-chat">💬 Ask the Assistant</button>
+    </div>
+
+    <!-- ── Analyzer panel ──────────────────────────────────── -->
+    <div id="panel-analyzer" class="mode-panel active" role="tabpanel" aria-labelledby="tab-analyzer">
+      <section id="analyzer-section" class="section" aria-label="Item Analyzer">
+        <h2 class="section-title">Item Analyzer</h2>
+        <p class="section-subtitle">Type any electronic item or upload a photo to get instant disposal guidance.</p>
+
+        <div class="analyzer-box" id="analyzer-box">
+          <!-- Main input row -->
+          <div class="input-row">
+            <label for="item-input" class="sr-only">Describe the e-waste item</label>
+            <input type="text" id="item-input" placeholder="e.g. swollen power bank, old phone charger…" autocomplete="off" maxlength="300" />
+            <label class="upload-label" for="img-upload" title="Upload a photo" aria-label="Upload item photo">📷
+              <input type="file" id="img-upload" accept="image/*" style="display:none" />
+            </label>
+            <div id="img-preview-wrap">
+              <img id="img-preview" src="" alt="Uploaded item preview" />
+              <button class="remove-img" id="remove-img" aria-label="Remove uploaded image">✕</button>
+            </div>
+            <button class="btn btn-primary" id="analyze-btn" aria-label="Analyze item">Analyze ➜</button>
+          </div>
+
+          <!-- Follow-up fields -->
+          <div class="followup-row">
+            <div>
+              <label for="fu-working">Is it still working?</label>
+              <select id="fu-working">
+                <option value="">— select —</option>
+                <option value="Yes, fully functional">Yes, fully functional</option>
+                <option value="Partially working">Partially working</option>
+                <option value="Not working">Not working</option>
+              </select>
+            </div>
+            <div>
+              <label for="fu-damage">Visible damage?</label>
+              <select id="fu-damage">
+                <option value="">— select —</option>
+                <option value="No visible damage">No visible damage</option>
+                <option value="Cracked or broken casing">Cracked / broken casing</option>
+                <option value="Swelling or bulging">Swelling / bulging</option>
+                <option value="Burn marks or melting">Burn marks / melting</option>
+                <option value="Leaking fluid">Leaking fluid</option>
+              </select>
+            </div>
+            <div>
+              <label for="fu-age">Approximate age (years)</label>
+              <input type="number" id="fu-age" min="0" max="50" placeholder="e.g. 3" />
+            </div>
+          </div>
+
+          <!-- Example chips -->
+          <div class="example-chips" role="list" aria-label="Example items">
+            <button class="chip" role="listitem">🔋 Old power bank</button>
+            <button class="chip" role="listitem">📱 Broken smartphone</button>
+            <button class="chip" role="listitem">💻 Dead laptop</button>
+            <button class="chip" role="listitem">🖥 Cracked monitor</button>
+            <button class="chip" role="listitem">🎧 Broken earphones</button>
+            <button class="chip" role="listitem">🔌 Old phone charger</button>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="empty-state">
+          <div class="empty-icon">♻</div>
+          <p>Enter an item above to receive instant disposal guidance,<br>hazard rating, and eco-impact information.</p>
+        </div>
+
+        <!-- Skeleton loader -->
+        <div class="skeleton-wrap" id="skeleton" style="display:none">
+          <div class="skeleton-line" style="height:28px;width:55%"></div>
+          <div class="skeleton-line" style="height:18px;width:80%;margin-top:14px"></div>
+          <div class="skeleton-line" style="height:18px;width:65%"></div>
+          <div class="skeleton-line" style="height:60px;margin-top:10px"></div>
+          <div class="skeleton-line" style="height:60px"></div>
+        </div>
+
+        <!-- Result card -->
+        <div class="card" id="result-card" aria-live="polite">
+          <div class="result-header">
+            <div>
+              <div class="result-category" id="res-category"></div>
+              <div style="margin-top:6px">
+                <span id="res-ewaste-badge"></span>
+              </div>
+            </div>
+            <div class="result-badges">
+              <span class="hazard-badge" id="res-hazard"></span>
+              <span class="pill pill-muted" id="res-confidence"></span>
+            </div>
+          </div>
+
+          <div class="result-action">
+            Recommended action: <strong id="res-action"></strong>
+          </div>
+
+          <div id="res-disposal" style="font-size:.9rem;color:var(--muted);margin-bottom:16px;"></div>
+
+          <div class="materials-row" id="res-materials"></div>
+
+          <div class="info-block amber" id="res-safety">
+            <strong>⚠ Safety Precautions</strong>
+            <ul id="res-safety-list"></ul>
+          </div>
+
+          <div class="info-block green" id="res-env">
+            <strong>🌱 Environmental Note</strong>
+            <p id="res-env-text" style="margin-top:6px"></p>
+            <p id="res-co2" style="margin-top:6px; font-size:.85rem;"></p>
+          </div>
+
+          <div class="disclaimer" id="res-disclaimer">
+            ⚠ This is AI-generated guidance only. EcoSort AI is not a certified hazardous-waste professional.
+            For high-risk or emergency situations, contact your local waste authority or emergency services.
+          </div>
+          <div class="result-source" id="res-source"></div>
+
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" id="cert-btn">📄 Generate Certificate</button>
+            <button class="btn btn-ghost btn-sm" id="copy-btn">📋 Copy Summary</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ── Chat panel ───────────────────────────────────────── -->
+    <div id="panel-chat" class="mode-panel" role="tabpanel" aria-labelledby="tab-chat">
+      <section id="chat-section" class="section" aria-label="AI Chat Assistant">
+        <h2 class="section-title">Ask the Assistant</h2>
+        <p class="section-subtitle">Have a question about repair, safety, local rules, or environmental impact? Ask away.</p>
+
+        <div class="chat-panel">
+          <div class="chat-header">
+            <div class="chat-avatar" aria-hidden="true">🤖</div>
+            <div class="chat-header-text">
+              <strong>EcoSort Assistant</strong>
+              <p>Powered by Google Gemini · E-waste guidance only</p>
+            </div>
+          </div>
+          <div id="chat-log" role="log" aria-label="Chat messages" aria-live="polite"></div>
+          <div class="chat-input-row">
+            <label for="chat-input" class="sr-only">Type your message</label>
+            <textarea id="chat-input" rows="1" placeholder="Ask about repair, recycling, safety…" maxlength="2000" aria-label="Chat message input"></textarea>
+            <button class="send-btn" id="send-btn" aria-label="Send message">➤</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- ── Category showcase ─────────────────────────────────── -->
+  <section id="categories-section" class="section" aria-label="E-waste categories">
+    <div class="container">
+      <h2 class="section-title">E-Waste Categories</h2>
+      <p class="section-subtitle">Click any category to instantly analyze it in the Analyzer.</p>
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+  </section>
+
+  <!-- ── Tools ─────────────────────────────────────────────── -->
+  <section id="tools-section" class="section" aria-label="Eco Tools">
+    <div class="container">
+      <h2 class="section-title">Eco Tools</h2>
+      <p class="section-subtitle">Quick calculators to guide smarter decisions.</p>
+      <div class="tools-grid">
+
+        <!-- Repair vs Replace -->
+        <div class="card tool-card">
+          <h3>🔧 Repair vs. Replace</h3>
+          <p class="desc">Select a category and let AI predict costs — or enter your own for a precise recommendation.</p>
+          <label for="rvr-category">Item category</label>
+          <select id="rvr-category">
+            <option value="">— select category —</option>
+          </select>
+          <label for="rvr-condition">Item condition</label>
+          <select id="rvr-condition">
+            <option value="">— select —</option>
+            <option value="Good — minor issue only">Good — minor issue only</option>
+            <option value="Fair — partially working">Fair — partially working</option>
+            <option value="Poor — not working">Poor — not working</option>
+            <option value="Damaged — cracked or broken casing">Damaged — cracked/broken casing</option>
+          </select>
+          <label for="rvr-age">Approximate age (years)</label>
+          <input type="number" id="rvr-age" min="0" max="30" placeholder="e.g. 3 (optional)" />
+          <label for="rvr-repair">Repair cost estimate (USD) <span style="color:var(--muted);font-weight:400">— leave blank to auto-predict</span></label>
+          <input type="number" id="rvr-repair" min="0" placeholder="e.g. 60 (optional)" />
+          <label for="rvr-replace">Replacement cost (USD) <span style="color:var(--muted);font-weight:400">— leave blank to auto-predict</span></label>
+          <input type="number" id="rvr-replace" min="0" placeholder="e.g. 250 (optional)" />
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
+            <button class="btn btn-primary btn-sm" id="rvr-btn">🤖 Ask AI</button>
+            <button class="btn btn-ghost btn-sm" id="rvr-local-btn">Calculate locally</button>
+          </div>
+          <div class="tool-result" id="rvr-result"></div>
+        </div>
+
+        <!-- CO2 estimator -->
+        <div class="card tool-card">
+          <h3>🌍 CO₂ Savings Estimator</h3>
+          <p class="desc">See how much CO₂ you avoid by recycling instead of landfilling.</p>
+          <label for="co2-category">Item category</label>
+          <select id="co2-category">
+            <option value="">— select category —</option>
+          </select>
+          <label for="co2-qty">Quantity</label>
+          <input type="number" id="co2-qty" min="1" value="1" max="100" />
+          <button class="btn btn-primary btn-sm" id="co2-btn">Estimate</button>
+          <div class="tool-result" id="co2-result"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Drop-off locator ───────────────────────────────────── -->
+  <section id="dropoff-section" class="section" aria-label="Drop-off channels">
+    <div class="container">
+      <h2 class="section-title">Drop-Off Channels</h2>
+      <p class="section-subtitle">Understand your legitimate disposal options — and find one near you.</p>
+      <div class="channels-grid" id="channels-grid"></div>
+      <div class="locator-box">
+      <h3>🗺 Find a Drop-Off Near You</h3>
+      <p>Enter your city or area and Gemini AI will provide location-aware disposal guidance for your region.</p>
+      <label for="locator-category" style="font-size:.82rem;color:var(--muted);display:block;margin-bottom:4px;">Item type (optional)</label>
+      <select id="locator-category" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px 12px;font-size:.88rem;margin-bottom:10px;">
+        <option value="">— any item —</option>
+      </select>
+      <div class="locator-input-row">
+        <input type="text" id="locator-input" placeholder="e.g. Mumbai, London, New York…" aria-label="City or area name" maxlength="100" />
+        <button class="btn btn-primary btn-sm" id="locator-btn">🤖 Search</button>
+      </div>
+      <div id="locator-msg" role="alert"></div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ── How it works ──────────────────────────────────────── -->
+  <section id="howitworks-section" class="section" aria-label="How EcoSort AI works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Four AI roles working together for smarter e-waste decisions.</p>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-num">1</div>
+          <h4>Classification</h4>
+          <p>Keyword matching plus Gemini's natural language understanding identifies the item category and hazard tier from a free-text description or photo.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-num">2</div>
+          <h4>Information Retrieval</h4>
+          <p>A structured knowledge base of e-waste categories, materials, disposal routes, and CO₂ data grounds the AI's responses with verified facts.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-num">3</div>
+          <h4>Summarization</h4>
+          <p>Gemini condenses complex hazard and disposal information into concise, actionable guidance tailored to the specific item described.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-num">4</div>
+          <h4>Conversational Guidance</h4>
+          <p>The chat assistant maintains context across turns to help users explore repair options, safety questions, local regulations, and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Responsible AI ─────────────────────────────────────── -->
+  <section id="rai-section" class="section" aria-label="Responsible AI">
+    <div class="container">
+      <h2 class="section-title">Responsible AI</h2>
+      <p class="section-subtitle">EcoSort AI is built with fairness, transparency, and user safety as first principles.</p>
+      <div class="rai-grid">
+        <div class="rai-card">
+          <h4>⚖ Fairness</h4>
+          <p>Guidance is category-based, not user-specific. No personal data is stored or used to differentiate recommendations.</p>
+        </div>
+        <div class="rai-card">
+          <h4>🔍 Transparency</h4>
+          <p>Every result shows its source (local keyword match vs. Gemini) and confidence level. The AI's role is clearly explained.</p>
+        </div>
+        <div class="rai-card">
+          <h4>🛡 Safety</h4>
+          <p>The assistant is constrained by a strict system prompt to flag urgent hazards, refuse dangerous advice, and always escalate to professionals.</p>
+        </div>
+        <div class="rai-card">
+          <h4>🔒 Privacy</h4>
+          <p>No analytics, no cookies, no external trackers. Chat history lives only in your browser session memory and is never persisted server-side.</p>
+        </div>
+        <div class="rai-card">
+          <h4>🧭 Ethics</h4>
+          <p>The system explicitly refuses to recommend illegal dumping, burning, or unsafe dismantling — and always cites certified disposal channels.</p>
+        </div>
+        <div class="rai-card">
+          <h4>📢 Disclaimer</h4>
+          <p>EcoSort AI is a guidance tool, not a certified hazardous-waste authority. For high-risk or emergency cases, always contact local professionals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── Footer ──────────────────────────────────────────────── -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">♻ EcoSort AI</div>
+        <p>AI-powered e-waste disposal guidance.<br>Built for an AI for Sustainability internship project.</p>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="pill pill-green" style="font-size:.72rem;">SDG 12</span>
+          <span class="pill pill-blue" style="font-size:.72rem;">SDG 11</span>
+          <span class="pill pill-copper" style="font-size:.72rem;">Gemini AI</span>
+        </div>
+      </div>
+      <div>
+        <strong style="font-size:.85rem; color:var(--text);">Quick links</strong>
+        <ul style="list-style:none; margin-top:8px; display:flex; flex-direction:column; gap:5px;">
+          <li><a href="#analyzer-section" style="font-size:.83rem;">Analyzer</a></li>
+          <li><a href="#categories-section" style="font-size:.83rem;">Categories</a></li>
+          <li><a href="#tools-section" style="font-size:.83rem;">Tools</a></li>
+          <li><a href="#dropoff-section" style="font-size:.83rem;">Drop-Off</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      ⚠ EcoSort AI provides guidance only and is not a certified hazardous-waste expert. Always consult your local waste authority or a certified e-waste recycler for high-risk materials. · No personal data is collected or stored.
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════════════════════
+     JavaScript
+     ════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── Config ────────────────────────────────────────────────────
+const BACKEND_URL = 'http://localhost:5000';
+
+// ── State ─────────────────────────────────────────────────────
+let KB = { categories: [], disposal_channels: [], co2_comparisons: {} };
+let lastResult = null;
+let chatHistory = [];
+let sessionCount = parseInt(sessionStorage.getItem('ecosort_count') || '0', 10);
+let uploadedImageB64 = null;
+
+// ── Helpers: toast ────────────────────────────────────────────
+function showToast(msg, duration = 3000) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  t.setAttribute('role', 'status');
+  c.appendChild(t);
+  requestAnimationFrame(() => { requestAnimationFrame(() => { t.classList.add('show'); }); });
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, duration);
+}
+
+// ── Theme ─────────────────────────────────────────────────────
+(function initTheme() {
+  const saved = localStorage.getItem('ecosort_theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-btn').textContent = '☀';
+  }
+})();
+
+document.getElementById('theme-btn').addEventListener('click', () => {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('ecosort_theme', isLight ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = isLight ? '☀' : '🌙';
+  showToast(isLight ? '☀ Light mode on' : '🌙 Dark mode on');
+});
+
+// ── Hamburger ─────────────────────────────────────────────────
+document.getElementById('hamburger').addEventListener('click', function() {
+  const links = document.getElementById('nav-links');
+  const open = links.classList.toggle('open');
+  this.setAttribute('aria-expanded', open);
+});
+
+// ── Session counter ───────────────────────────────────────────
+function updateCounter() {
+  document.getElementById('session-count').textContent = sessionCount;
+}
+updateCounter();
+
+// ── Backend health ────────────────────────────────────────────
+async function checkHealth() {
+  const dot = document.getElementById('status-dot');
+  const label = document.getElementById('status-label');
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/health`, { signal: AbortSignal.timeout(4000) });
+    if (r.ok) {
+      const d = await r.json();
+      dot.className = 'status-dot online';
+      label.textContent = d.gemini_configured ? 'AI Online' : 'Backend Online (no key)';
+      if (!d.gemini_configured) showToast('⚠ Backend reachable but GEMINI_API_KEY is not set.');
+      return true;
+    }
+  } catch (_) {}
+  dot.className = 'status-dot offline';
+  label.textContent = 'Offline';
+  return false;
+}
+checkHealth();
+setInterval(checkHealth, 30000);
+
+// ── Load knowledge base ───────────────────────────────────────
+async function loadKB() {
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/knowledge`, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) KB = await r.json();
+  } catch (_) {
+    // Use embedded fallback KB so the app still works offline
+    KB = FALLBACK_KB;
+  }
+  buildCategoryGrid();
+  buildCategorySelects();
+  buildChannelsGrid();
+}
+
+// ── Embedded fallback KB (minimal, no backend needed) ─────────
+const FALLBACK_KB = {
+  co2_comparisons: { km_per_kg_co2: 6.2 },
+  disposal_channels: [
+    { name: 'Authorized E-Waste Recycler', description: 'Certified processors that safely dismantle and recover materials.', accepts: 'All e-waste categories', icon: '🏭' },
+    { name: 'Manufacturer Take-Back', description: 'Brand-run schemes (Apple, Samsung, Dell…) for their own products.', accepts: 'Brand-specific devices', icon: '🏷' },
+    { name: 'Retailer Drop-Box', description: 'In-store collection bins at electronics retailers.', accepts: 'Small consumer electronics & batteries', icon: '🛒' },
+    { name: 'Municipal Collection Drive', description: 'City/council-organized periodic collection events.', accepts: 'Wide variety of household e-waste', icon: '🏛' },
+    { name: 'Repair Café / Local Shop', description: 'Community repair workshops that extend device lifespan.', accepts: 'Repairable electronics', icon: '🔧' },
+  ],
+  categories: [
+    { id:'battery',        name:'Battery',              keywords:['battery','batteries','power bank','lithium','cell','rechargeable','alkaline'], hazard_level:'High',   recommended_action:'Recycle',       icon:'🔋', estimated_co2_saved_kg:12.5, avg_repair_cost_usd:0,   avg_replacement_cost_usd:25,  repair_feasibility:'Low',    hazard_code:'HW-BAT', recoverable_materials:['Lithium','Cobalt','Nickel'],           safety_notes:['Never puncture or crush','Keep away from heat','Do not charge if swollen'], environmental_note:'Lithium batteries contain toxic heavy metals that contaminate soil and water.', disposal_text:'Take to a certified battery recycler or retailer drop-box. Never place in general waste.' },
+    { id:'charger',        name:'Charger',              keywords:['charger','adapter','power adapter','charging cable','power brick','usb charger'], hazard_level:'Medium', recommended_action:'Reuse / Recycle', icon:'🔌', estimated_co2_saved_kg:3.2,  avg_repair_cost_usd:15,  avg_replacement_cost_usd:20,  repair_feasibility:'Medium', hazard_code:'HW-CHG', recoverable_materials:['Copper','Aluminum','Plastic'], safety_notes:['Check for fraying before reuse','Avoid counterfeit replacements'], environmental_note:'Copper recovery from chargers reduces mining demand.', disposal_text:'Donate if working, or drop at a retailer collection bin.' },
+    { id:'cable',          name:'Cable / Wire',         keywords:['cable','wire','cord','usb cable','hdmi','ethernet','audio cable'], hazard_level:'Low',    recommended_action:'Recycle',       icon:'🔗', estimated_co2_saved_kg:0.8,  avg_repair_cost_usd:5,   avg_replacement_cost_usd:10,  repair_feasibility:'Low',    hazard_code:'HW-CAB', recoverable_materials:['Copper','Plastic'],            safety_notes:['Bundle cables to avoid tangling in machinery'], environmental_note:'Copper in cables is highly recyclable.', disposal_text:'Place in a small-e-waste bin at your local recycler.' },
+    { id:'phone',          name:'Smartphone / Tablet',  keywords:['phone','smartphone','mobile','iphone','android','tablet','ipad','cell phone'], hazard_level:'High',   recommended_action:'Repair / Donate', icon:'📱', estimated_co2_saved_kg:70,   avg_repair_cost_usd:80,  avg_replacement_cost_usd:300, repair_feasibility:'High',   hazard_code:'HW-PHN', recoverable_materials:['Gold','Silver','Copper','Lithium'], safety_notes:['Remove SIM and wipe data before disposal','Do not disassemble lithium battery'], environmental_note:'Manufacturing a new smartphone produces ~70 kg CO₂. Repair or donate first.', disposal_text:'Wipe data, then donate, sell, or take to an authorized recycler.' },
+    { id:'earphones',      name:'Earphones / Headphones', keywords:['earphones','earbuds','headphones','headset','airpods','wireless earbuds'], hazard_level:'Medium', recommended_action:'Recycle',       icon:'🎧', estimated_co2_saved_kg:4.5,  avg_repair_cost_usd:20,  avg_replacement_cost_usd:40,  repair_feasibility:'Low',    hazard_code:'HW-EAR', recoverable_materials:['Copper','Neodymium','Plastic'],        safety_notes:['Contains small magnets — keep from pacemakers'], environmental_note:'Neodymium magnets are rare earth elements worth recovering.', disposal_text:'Drop at any small-e-waste recycling point.' },
+    { id:'keyboard_mouse', name:'Keyboard / Mouse',     keywords:['keyboard','mouse','trackpad','trackball','mechanical keyboard','wireless mouse'], hazard_level:'Low',    recommended_action:'Donate / Recycle', icon:'⌨',  estimated_co2_saved_kg:6,    avg_repair_cost_usd:20,  avg_replacement_cost_usd:50,  repair_feasibility:'Medium', hazard_code:'HW-INP', recoverable_materials:['Copper','Aluminum','Plastic','Steel'],  safety_notes:['May contain small batteries — remove before recycling'], environmental_note:'Steel and aluminum in peripherals are infinitely recyclable.', disposal_text:'Donate if working; recycle through municipal or retailer programs.' },
+    { id:'small_appliance', name:'Small Appliance',     keywords:['toaster','hair dryer','blender','iron','shaver','kettle','microwave','fan','radio','speaker'], hazard_level:'Medium', recommended_action:'Repair / Recycle', icon:'🍞', estimated_co2_saved_kg:15,   avg_repair_cost_usd:30,  avg_replacement_cost_usd:60,  repair_feasibility:'Medium', hazard_code:'HW-SMA', recoverable_materials:['Copper','Steel','Aluminum','Plastic'],  safety_notes:['Unplug before inspection','Some contain capacitors that hold charge'], environmental_note:'Small appliances are among the fastest-growing e-waste streams.', disposal_text:'Check for repair cafes locally; otherwise use municipal collection.' },
+    { id:'laptop',         name:'Laptop / Notebook',    keywords:['laptop','notebook','ultrabook','macbook','chromebook','netbook','computer'], hazard_level:'High',   recommended_action:'Repair / Donate', icon:'💻', estimated_co2_saved_kg:300,  avg_repair_cost_usd:150, avg_replacement_cost_usd:600, repair_feasibility:'High',   hazard_code:'HW-LAP', recoverable_materials:['Gold','Silver','Copper','Aluminum','Lithium'], safety_notes:['Wipe all data (factory reset or drive shred)','Do not remove lithium battery without training'], environmental_note:'A laptop contains ~300 g of copper and trace amounts of gold — highly worth recovering.', disposal_text:'Wipe data. Donate/sell if working. Use certified recycler for broken units.' },
+    { id:'tv_monitor',     name:'TV / Monitor',         keywords:['tv','television','monitor','screen','display','lcd','led','oled','crt','flat screen'], hazard_level:'High',   recommended_action:'Recycle',       icon:'🖥',  estimated_co2_saved_kg:200,  avg_repair_cost_usd:100, avg_replacement_cost_usd:400, repair_feasibility:'Medium', hazard_code:'HW-TVM', recoverable_materials:['Copper','Aluminum','Glass','Indium'],    safety_notes:['CRT screens contain lead — never break','Heavy items — use proper lifting'], environmental_note:'LCD screens contain indium, a rare element critical to future displays.', disposal_text:'Most municipal programs accept screens. Never landfill — they contain toxic materials.' },
+    { id:'printer',        name:'Printer / Scanner',    keywords:['printer','scanner','fax','copier','inkjet','laser printer','all-in-one'], hazard_level:'Medium', recommended_action:'Recycle',       icon:'🖨',  estimated_co2_saved_kg:25,   avg_repair_cost_usd:60,  avg_replacement_cost_usd:120, repair_feasibility:'Medium', hazard_code:'HW-PRN', recoverable_materials:['Copper','Aluminum','Plastic','Steel'],  safety_notes:['Remove ink cartridges — recycle separately','Toner dust is hazardous — avoid breathing'], environmental_note:'Printer ink cartridges can be refilled or recycled through manufacturer programs.', disposal_text:'Remove cartridges first. Take to an authorized recycler or municipal program.' },
+    { id:'non_ewaste',     name:'Non-E-Waste Item',     keywords:['paper','cardboard','plastic bag','glass','food','organic','newspaper'], hazard_level:'None',   recommended_action:'Standard Recycling', icon:'♻',  estimated_co2_saved_kg:0,    avg_repair_cost_usd:0,   avg_replacement_cost_usd:0,   repair_feasibility:'N/A',    hazard_code:'N/A',    recoverable_materials:[],                              safety_notes:['No special handling required'], environmental_note:'Diverting this from landfill through standard recycling helps the environment.', disposal_text:'This item does not qualify as e-waste. Use your local recycling or composting program.' },
+  ]
+};
+
+// ── Build UI from KB ──────────────────────────────────────────
+function buildCategoryGrid() {
+  const grid = document.getElementById('category-grid');
+  grid.innerHTML = '';
+  const cats = (KB.categories || []).filter(c => c.id !== 'non_ewaste');
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-card';
+    btn.setAttribute('aria-label', `Analyze ${cat.name}`);
+    const hazardClass = { High:'pill-red', Medium:'pill-copper', Low:'pill-green', None:'pill-muted' }[cat.hazard_level] || 'pill-muted';
+    btn.innerHTML = `
+      <div class="cat-icon" aria-hidden="true">${cat.icon || '📦'}</div>
+      <div class="cat-name">${cat.name}</div>
+      <span class="pill ${hazardClass}">${cat.hazard_level} Hazard</span>
+    `;
+    btn.addEventListener('click', () => {
+      document.getElementById('item-input').value = cat.name;
+      document.querySelector('[data-section="analyzer"]') && null;
+      // Switch to analyzer tab and scroll
+      activateTab('analyzer');
+      document.getElementById('analyzer-section').scrollIntoView({ behavior: 'smooth' });
+      runAnalysis(cat.name);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function buildCategorySelects() {
+  const cats = (KB.categories || []).filter(c => c.id !== 'non_ewaste');
+  ['rvr-category', 'co2-category'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '<option value="">— select category —</option>';
+    cats.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat.id;
+      opt.textContent = cat.name;
+      sel.appendChild(opt);
+    });
+  });
+  // Locator category select
+  const locSel = document.getElementById('locator-category');
+  if (locSel) {
+    locSel.innerHTML = '<option value="">— any item —</option>';
+    cats.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat.id;
+      opt.textContent = cat.name;
+      locSel.appendChild(opt);
+    });
+  }
+}
+
+function buildChannelsGrid() {
+  const grid = document.getElementById('channels-grid');
+  grid.innerHTML = '';
+  (KB.disposal_channels || []).forEach(ch => {
+    const card = document.createElement('div');
+    card.className = 'channel-card';
+    card.innerHTML = `
+      <div class="channel-icon" aria-hidden="true">${ch.icon || '♻'}</div>
+      <h4>${ch.name}</h4>
+      <p>${ch.description}</p>
+      <div class="channel-accepts"><strong>Accepts:</strong> ${ch.accepts}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ── Tab switching ─────────────────────────────────────────────
+function activateTab(name) {
+  ['analyzer','chat'].forEach(n => {
+    document.getElementById(`tab-${n}`).classList.toggle('active', n === name);
+    document.getElementById(`tab-${n}`).setAttribute('aria-selected', n === name);
+    document.getElementById(`panel-${n}`).classList.toggle('active', n === name);
+  });
+}
+
+document.getElementById('tab-analyzer').addEventListener('click', () => activateTab('analyzer'));
+document.getElementById('tab-chat').addEventListener('click', () => activateTab('chat'));
+
+// ── Image upload ──────────────────────────────────────────────
+const imgUpload = document.getElementById('img-upload');
+const imgPreviewWrap = document.getElementById('img-preview-wrap');
+const imgPreview = document.getElementById('img-preview');
+
+imgUpload.addEventListener('change', () => {
+  const file = imgUpload.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadedImageB64 = e.target.result;
+    imgPreview.src = uploadedImageB64;
+    imgPreviewWrap.style.display = 'block';
+    // Auto-fill input with filename hint
+    if (!document.getElementById('item-input').value.trim()) {
+      document.getElementById('item-input').value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    }
+    showToast('📷 Image attached — will be included in analysis context.');
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('remove-img').addEventListener('click', () => {
+  uploadedImageB64 = null;
+  imgPreview.src = '';
+  imgPreviewWrap.style.display = 'none';
+  imgUpload.value = '';
+});
+
+// Drag & drop
+const analyzerBox = document.getElementById('analyzer-box');
+analyzerBox.addEventListener('dragover', e => { e.preventDefault(); analyzerBox.classList.add('drag-over'); });
+analyzerBox.addEventListener('dragleave', () => analyzerBox.classList.remove('drag-over'));
+analyzerBox.addEventListener('drop', e => {
+  e.preventDefault();
+  analyzerBox.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    imgUpload.files = dt.files;
+    imgUpload.dispatchEvent(new Event('change'));
+  }
+});
+
+// ── Example chips ─────────────────────────────────────────────
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    // Strip leading emoji + space
+    const text = chip.textContent.replace(/^[\p{Emoji}\s]+/u, '').trim();
+    document.getElementById('item-input').value = text;
+    runAnalysis(text);
+  });
+});
+
+// ── Analyze button / Enter key ────────────────────────────────
+document.getElementById('analyze-btn').addEventListener('click', () => {
+  const val = document.getElementById('item-input').value.trim();
+  if (val) runAnalysis(val);
+  else showToast('⚠ Please enter an item description first.');
+});
+
+document.getElementById('item-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('analyze-btn').click();
+  }
+});
+
+// ── Local classify ────────────────────────────────────────────
+function localClassify(desc) {
+  const lower = desc.toLowerCase();
+  const cats = KB.categories || FALLBACK_KB.categories;
+  let best = null, bestScore = 0;
+  cats.forEach(cat => {
+    if (cat.id === 'non_ewaste') return;
+    const score = (cat.keywords || []).filter(kw => lower.includes(kw.toLowerCase())).length;
+    if (score > bestScore) { bestScore = score; best = cat; }
+  });
+  if (bestScore === 0) {
+    const non = cats.find(c => c.id === 'non_ewaste');
+    if (non && (non.keywords || []).some(kw => lower.includes(kw.toLowerCase()))) return non;
+  }
+  return best;
+}
+
+// ── Run analysis ──────────────────────────────────────────────
+async function runAnalysis(desc) {
+  const fuWorking = document.getElementById('fu-working').value;
+  const fuDamage  = document.getElementById('fu-damage').value;
+  const fuAge     = document.getElementById('fu-age').value;
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('skeleton').style.display = 'block';
+
+  let result = null;
+
+  try {
+    const body = {
+      item_description: desc + (uploadedImageB64 ? ' [photo attached]' : ''),
+      follow_up_answers: {
+        working_status: fuWorking || undefined,
+        visible_damage: fuDamage  || undefined,
+        age_years:      fuAge     || undefined,
+      }
+    };
+
+    const r = await fetch(`${BACKEND_URL}/api/classify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(12000),
+    });
+
+    if (r.ok) {
+      result = await r.json();
+    } else {
+      throw new Error(`HTTP ${r.status}`);
+    }
+  } catch (_) {
+    // Backend unavailable — use local fallback
+    const cat = localClassify(desc);
+    if (cat) {
+      result = {
+        is_ewaste: cat.id !== 'non_ewaste',
+        category: cat.name,
+        category_id: cat.id,
+        hazard_level: cat.hazard_level,
+        hazard_code: cat.hazard_code || 'N/A',
+        recommended_action: cat.recommended_action,
+        disposal_text: cat.disposal_text,
+        safety_notes: cat.safety_notes || [],
+        environmental_note: cat.environmental_note || '',
+        recoverable_materials: cat.recoverable_materials || [],
+        estimated_co2_saved_kg: cat.estimated_co2_saved_kg || 0,
+        confidence: 'Medium',
+        source: 'local',
+      };
+    } else {
+      result = {
+        is_ewaste: null,
+        category: 'Unknown',
+        category_id: 'unknown',
+        hazard_level: 'Unknown',
+        hazard_code: 'N/A',
+        recommended_action: 'Consult a certified recycler',
+        disposal_text: 'Could not classify this item. Please consult your local certified e-waste recycler.',
+        safety_notes: ['Handle with care until properly classified.'],
+        environmental_note: 'When in doubt, always choose a certified recycler over landfill disposal.',
+        recoverable_materials: [],
+        estimated_co2_saved_kg: 0,
+        confidence: 'Low',
+        source: 'local',
+      };
+    }
+  }
+
+  document.getElementById('skeleton').style.display = 'none';
+  renderResult(result);
+  lastResult = { item: desc, ...result };
+
+  sessionCount++;
+  sessionStorage.setItem('ecosort_count', sessionCount);
+  updateCounter();
+}
+
+// ── Render result ─────────────────────────────────────────────
+function renderResult(r) {
+  const card = document.getElementById('result-card');
+
+  document.getElementById('res-category').textContent = r.category || 'Unknown';
+
+  const ewasteText = r.is_ewaste === true ? '✔ E-Waste' : r.is_ewaste === false ? '✗ Not E-Waste' : '? Unknown';
+  const ewastePill = r.is_ewaste === true ? 'pill-copper' : r.is_ewaste === false ? 'pill-green' : 'pill-muted';
+  document.getElementById('res-ewaste-badge').innerHTML = `<span class="pill ${ewastePill}">${ewasteText}</span>`;
+
+  const hz = (r.hazard_level || 'Unknown').toLowerCase();
+  const hzClass = hz === 'high' ? 'hazard-high' : hz === 'medium' ? 'hazard-medium' : hz === 'low' ? 'hazard-low' : 'hazard-none';
+  document.getElementById('res-hazard').textContent = `${r.hazard_level} Hazard`;
+  document.getElementById('res-hazard').className = `hazard-badge ${hzClass}`;
+
+  const confMap = { High: 'pill-green', Medium: 'pill-copper', Low: 'pill-red' };
+  document.getElementById('res-confidence').textContent = `${r.confidence || '?'} Confidence`;
+  document.getElementById('res-confidence').className = `pill ${confMap[r.confidence] || 'pill-muted'}`;
+
+  document.getElementById('res-action').textContent = r.recommended_action || '—';
+  document.getElementById('res-disposal').textContent = r.disposal_text || '';
+
+  // Materials
+  const matsEl = document.getElementById('res-materials');
+  matsEl.innerHTML = '';
+  (r.recoverable_materials || []).forEach(m => {
+    const span = document.createElement('span');
+    span.className = 'material-pill';
+    span.textContent = m;
+    matsEl.appendChild(span);
+  });
+
+  // Safety
+  const safetyList = document.getElementById('res-safety-list');
+  safetyList.innerHTML = '';
+  (r.safety_notes || []).forEach(note => {
+    const li = document.createElement('li');
+    li.textContent = note;
+    safetyList.appendChild(li);
+  });
+
+  // Environmental
+  document.getElementById('res-env-text').textContent = r.environmental_note || '';
+  const co2 = r.estimated_co2_saved_kg || 0;
+  const cmp = KB.co2_comparisons || FALLBACK_KB.co2_comparisons;
+  const km = (co2 * (cmp.km_per_kg_co2 || 6.2)).toFixed(1);
+  document.getElementById('res-co2').textContent = co2 > 0
+    ? `♻ Estimated CO₂ saved by recycling: ${co2} kg — equivalent to ${km} km not driven.`
+    : '';
+
+  document.getElementById('res-source').textContent =
+    `Result source: ${r.source === 'gemini' ? 'Gemini AI' : 'Local keyword match'}` +
+    (r.hazard_code && r.hazard_code !== 'N/A' ? ` · Code: ${r.hazard_code}` : '');
+
+  card.style.display = 'block';
+}
+
+// ── Certificate ───────────────────────────────────────────────
+document.getElementById('cert-btn').addEventListener('click', () => {
+  if (!lastResult) return;
+  const body = document.getElementById('cert-body');
+  const rows = [
+    ['Item', lastResult.item],
+    ['Category', lastResult.category],
+    ['Hazard Level', lastResult.hazard_level],
+    ['Hazard Code', lastResult.hazard_code || 'N/A'],
+    ['Recommended Action', lastResult.recommended_action],
+    ['Source', lastResult.source === 'gemini' ? 'Gemini AI' : 'Local classification'],
+    ['Date', new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })],
+    ['Platform', 'EcoSort AI — AI for Sustainability Project'],
+  ];
+  body.innerHTML = rows.map(([l,v]) =>
+    `<div class="cert-row"><span class="cert-label">${l}</span><span>${v}</span></div>`
+  ).join('');
+  document.getElementById('cert-modal').classList.add('open');
+});
+
+['cert-close','cert-close2'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    document.getElementById('cert-modal').classList.remove('open');
+  });
+});
+
+document.getElementById('cert-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('cert-modal'))
+    document.getElementById('cert-modal').classList.remove('open');
+});
+
+// ── Copy summary ──────────────────────────────────────────────
+document.getElementById('copy-btn').addEventListener('click', () => {
+  if (!lastResult) return;
+  const text = [
+    `EcoSort AI — Disposal Summary`,
+    `Item: ${lastResult.item}`,
+    `Category: ${lastResult.category}`,
+    `Hazard: ${lastResult.hazard_level}`,
+    `Action: ${lastResult.recommended_action}`,
+    lastResult.disposal_text,
+    `Date: ${new Date().toLocaleDateString()}`,
+  ].join('\n');
+  navigator.clipboard.writeText(text).then(() => showToast('📋 Summary copied to clipboard!'));
+});
+
+// ── Chat ──────────────────────────────────────────────────────
+function appendMsg(role, text) {
+  const log = document.getElementById('chat-log');
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+  if (role === 'bot') {
+    wrap.innerHTML = `<div class="msg-icon" aria-hidden="true">🤖</div><div class="msg-bubble"></div>`;
+    wrap.querySelector('.msg-bubble').textContent = text;
+  } else {
+    wrap.innerHTML = `<div class="msg-bubble"></div>`;
+    wrap.querySelector('.msg-bubble').textContent = text;
+  }
+  log.appendChild(wrap);
+  log.scrollTop = log.scrollHeight;
+  return wrap;
+}
+
+function showTyping() {
+  const log = document.getElementById('chat-log');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot';
+  wrap.id = 'typing-indicator';
+  wrap.innerHTML = `<div class="msg-icon" aria-hidden="true">🤖</div>
+    <div class="msg-bubble"><div class="typing-dots" aria-label="Assistant is typing">
+      <span></span><span></span><span></span>
+    </div></div>`;
+  log.appendChild(wrap);
+  log.scrollTop = log.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+// Seed opening message
+appendMsg('bot',
+  "👋 Hi! I'm EcoSort Assistant, powered by Google Gemini.\n\n" +
+  "I can help you with:\n" +
+  "• Safe handling of hazardous e-waste\n" +
+  "• Repair vs. replace decisions\n" +
+  "• Finding the right recycling channel\n" +
+  "• Environmental impact questions\n\n" +
+  "⚠ I'm guidance only — not a certified hazardous-waste professional. For emergencies (smoking/leaking battery etc.), contact your local emergency services immediately.\n\nWhat would you like to know?"
+);
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  appendMsg('user', msg);
+  chatHistory.push({ role: 'user', parts: [msg] });
+
+  showTyping();
+  document.getElementById('send-btn').disabled = true;
+
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, history: chatHistory.slice(-20) }),
+      signal: AbortSignal.timeout(20000),
+    });
+
+    removeTyping();
+
+    if (r.ok) {
+      const d = await r.json();
+      appendMsg('bot', d.reply);
+      chatHistory.push({ role: 'model', parts: [d.reply] });
+    } else {
+      const d = await r.json().catch(() => ({}));
+      const errMap = {
+        AUTH_ERROR: 'The AI backend is misconfigured (API key issue). Please contact the site owner.',
+        RATE_LIMITED: 'Too many requests — please wait a moment before sending another message.',
+        NOT_CONFIGURED: 'The AI assistant is not yet configured. Please set up the backend API key.',
+      };
+      appendMsg('bot', errMap[d.code] || 'Assistant is temporarily unavailable. Please try again shortly.');
+    }
+  } catch (err) {
+    removeTyping();
+    appendMsg('bot', err.name === 'TimeoutError'
+      ? 'Request timed out. Please try again.'
+      : 'Could not reach the assistant. Check that the backend is running.');
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+document.getElementById('send-btn').addEventListener('click', sendChat);
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+// Auto-resize textarea
+document.getElementById('chat-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// ── Repair vs Replace ─────────────────────────────────────────
+// ── Repair vs Replace — AI handler ───────────────────────────
+async function runRvrAI() {
+  const catId   = document.getElementById('rvr-category').value;
+  const repair  = document.getElementById('rvr-repair').value.trim();
+  const replace = document.getElementById('rvr-replace').value.trim();
+  const condition = document.getElementById('rvr-condition').value;
+  const age     = document.getElementById('rvr-age').value.trim();
+  const res     = document.getElementById('rvr-result');
+
+  if (!catId) { showToast('⚠ Please select a category first.'); return; }
+
+  res.className = 'tool-result neutral show';
+  res.innerHTML = '<div class="typing-dots" style="padding:4px 0"><span></span><span></span><span></span></div>';
+
+  try {
+    const body = {
+      category_id:  catId,
+      repair_cost:  repair  !== '' ? parseFloat(repair)  : null,
+      replace_cost: replace !== '' ? parseFloat(replace) : null,
+      condition:    condition || undefined,
+      age_years:    age !== '' ? parseInt(age, 10) : undefined,
+    };
+    const r = await fetch(`${BACKEND_URL}/api/repair-advice`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(12000),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'API error');
+
+    const recMap = { Repair: 'good', Replace: 'bad', Borderline: 'neutral' };
+    const recIcon = { Repair: '✔', Replace: '✘', Borderline: '⚖' };
+    const cls = recMap[d.recommendation] || 'neutral';
+    const icon = recIcon[d.recommendation] || '⚖';
+
+    // Auto-fill cost fields if predicted
+    if (body.repair_cost === null && d.predicted_repair_cost)
+      document.getElementById('rvr-repair').value = d.predicted_repair_cost;
+    if (body.replace_cost === null && d.predicted_replace_cost)
+      document.getElementById('rvr-replace').value = d.predicted_replace_cost;
+
+    res.className = `tool-result ${cls} show`;
+    res.innerHTML = `
+      <strong>${icon} ${d.recommendation}</strong><br>
+      <span style="font-size:.82rem;color:var(--muted)">Est. repair: <strong>$${d.predicted_repair_cost}</strong> · Est. replacement: <strong>$${d.predicted_replace_cost}</strong></span>
+      <p style="margin-top:8px">${d.reasoning}</p>
+      ${d.tip ? `<p style="margin-top:6px;font-size:.82rem;color:var(--muted)">💡 ${d.tip}</p>` : ''}
+      <p style="margin-top:6px;font-size:.72rem;color:var(--muted)">Source: ${d.source === 'gemini' ? 'Gemini AI' : 'Local estimate'}</p>
+    `;
+  } catch (err) {
+    res.className = 'tool-result bad show';
+    res.innerHTML = `Could not get AI advice: ${err.message}. Try the local calculator instead.`;
+  }
+}
+
+// ── Repair vs Replace — local handler ────────────────────────
+function runRvrLocal() {
+  const catId   = document.getElementById('rvr-category').value;
+  const repair  = parseFloat(document.getElementById('rvr-repair').value);
+  const replace = parseFloat(document.getElementById('rvr-replace').value);
+  const res     = document.getElementById('rvr-result');
+
+  if (!catId || isNaN(repair) || isNaN(replace) || replace <= 0) {
+    showToast('⚠ Please select a category and enter both costs.'); return;
+  }
+
+  const ratio = repair / replace;
+  const cat = (KB.categories || FALLBACK_KB.categories).find(c => c.id === catId);
+  const feasibility = cat ? cat.repair_feasibility : 'Medium';
+  res.classList.remove('good','bad','neutral');
+
+  let msg, cls;
+  if (feasibility === 'Low') {
+    cls = 'neutral'; msg = `⚠ Repair feasibility for ${cat?.name} is generally <strong>Low</strong>. Even if cost seems reasonable, parts and technicians may be hard to find.`;
+  } else if (ratio <= 0.5) {
+    cls = 'good';
+    msg = `✔ <strong>Repair it.</strong> At $${repair.toFixed(0)}, repair is ${Math.round(ratio*100)}% of replacement ($${replace.toFixed(0)}) — under the 50% threshold.`;
+  } else if (ratio <= 0.75) {
+    cls = 'neutral';
+    msg = `⚖ <strong>Borderline.</strong> Repair is ${Math.round(ratio*100)}% of replacement. Consider the item's age and remaining lifespan.`;
+  } else {
+    cls = 'bad';
+    msg = `✘ <strong>Consider replacing.</strong> At ${Math.round(ratio*100)}% of replacement cost, repair is not economical.`;
+  }
+  res.innerHTML = msg;
+  res.className = `tool-result ${cls} show`;
+}
+
+document.getElementById('rvr-btn').addEventListener('click', runRvrAI);
+document.getElementById('rvr-local-btn').addEventListener('click', runRvrLocal);
+
+// ── CO₂ estimator ─────────────────────────────────────────────
+document.getElementById('co2-btn').addEventListener('click', () => {
+  const catId = document.getElementById('co2-category').value;
+  const qty   = parseInt(document.getElementById('co2-qty').value, 10);
+  const res   = document.getElementById('co2-result');
+
+  if (!catId || !qty || qty < 1) { showToast('⚠ Please select a category and enter a quantity.'); return; }
+
+  const cat = (KB.categories || FALLBACK_KB.categories).find(c => c.id === catId);
+  if (!cat) return;
+
+  const total = (cat.estimated_co2_saved_kg || 0) * qty;
+  const cmp = KB.co2_comparisons || FALLBACK_KB.co2_comparisons;
+  const km = (total * (cmp.km_per_kg_co2 || 6.2)).toFixed(0);
+
+  res.innerHTML = `🌍 Recycling <strong>${qty} × ${cat.name}</strong> instead of landfilling saves approximately <strong>${total.toFixed(1)} kg CO₂</strong> — equivalent to <strong>${km} km</strong> not driven in a typical car.`;
+  res.className = 'tool-result good show';
+});
+
+// ── Locator — Gemini-powered ──────────────────────────────────
+document.getElementById('locator-btn').addEventListener('click', async () => {
+  const city    = document.getElementById('locator-input').value.trim();
+  const catId   = document.getElementById('locator-category').value;
+  const msg     = document.getElementById('locator-msg');
+
+  if (!city) { showToast('⚠ Please enter a city or area name.'); return; }
+
+  msg.style.display = 'block';
+  msg.innerHTML = '<div class="typing-dots" style="padding:6px 0"><span></span><span></span><span></span></div>';
+
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/dropoff`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city, category_id: catId || undefined }),
+      signal: AbortSignal.timeout(12000),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'API error');
+
+    // Convert newlines to <br> and ** bold ** to <strong>
+    const formatted = (d.guidance || '')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    msg.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <strong>🗺 ${city}</strong>
+        <span class="pill ${d.source === 'gemini' ? 'pill-copper' : 'pill-muted'}" style="font-size:.72rem">
+          ${d.source === 'gemini' ? 'Gemini AI' : 'Local guidance'}
+        </span>
+      </div>
+      <div style="font-size:.88rem;line-height:1.7">${formatted}</div>
+      <p style="margin-top:12px;font-size:.78rem;color:var(--muted)">
+        ⚠ AI guidance only — always verify with official local sources before travelling to a drop-off site.
+      </p>`;
+  } catch (err) {
+    msg.innerHTML = `
+      <strong>🗺 ${city}</strong><br>
+      <span style="font-size:.85rem">Could not reach the AI. Try these instead:</span>
+      <ul style="margin:8px 0 0 18px;font-size:.84rem;">
+        <li>Search "<strong>${city} e-waste recycling</strong>" on Google Maps</li>
+        <li>Visit your city's official municipal waste website</li>
+        <li><a href="https://www.earth911.com" target="_blank" rel="noopener">earth911.com</a> (US/Canada)</li>
+      </ul>`;
+  }
+});
+
+// ── Keyboard shortcuts ────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('cert-modal').classList.remove('open');
+    document.getElementById('nav-links').classList.remove('open');
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────
+loadKB();
+</script>
+</body>
+</html>

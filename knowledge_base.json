@@ -1,0 +1,272 @@
+{
+  "categories": [
+    {
+      "id": "battery",
+      "name": "Battery",
+      "keywords": ["battery", "batteries", "cell", "power bank", "lithium", "alkaline", "lead-acid", "rechargeable", "swollen battery"],
+      "hazard_level": "High",
+      "hazard_code": "HW-01",
+      "recommended_action": "Drop off at a certified e-waste collection point or retailer take-back bin",
+      "disposal_text": "Batteries contain toxic heavy metals and flammable electrolytes. Never place in general waste or recycling bins. Take to a designated battery drop-off point such as a retailer collection bin or authorized e-waste recycler.",
+      "safety_notes": [
+        "Do not puncture, crush, or expose to heat",
+        "If swollen, place in a fireproof container and dispose of immediately",
+        "Keep away from metal objects to prevent short-circuit",
+        "Lithium batteries can cause fires if damaged — handle with care"
+      ],
+      "environmental_note": "Lithium-ion batteries leach cobalt and nickel into soil and groundwater. Proper recycling recovers critical minerals and prevents toxic contamination.",
+      "recoverable_materials": ["lithium", "cobalt", "nickel", "manganese"],
+      "estimated_co2_saved_kg": 12.5,
+      "repair_feasibility": "Low",
+      "avg_repair_cost_usd": 0,
+      "avg_replacement_cost_usd": 25,
+      "icon": "🔋"
+    },
+    {
+      "id": "charger",
+      "name": "Charger / Power Adapter",
+      "keywords": ["charger", "adapter", "power adapter", "charging cable", "power brick", "transformer", "ac adapter", "usb charger"],
+      "hazard_level": "Medium",
+      "hazard_code": "HW-02",
+      "recommended_action": "Donate if functional; recycle via e-waste drop-off if broken",
+      "disposal_text": "Chargers and power adapters contain copper wiring and flame-retardant plastics. Do not place in household recycling. Deposit at an e-waste collection point or retailer drop-box.",
+      "safety_notes": [
+        "Do not use damaged or frayed chargers — risk of electric shock or fire",
+        "Unplug before inspecting or disposing",
+        "Do not expose to moisture"
+      ],
+      "environmental_note": "Copper recovery from charger wiring significantly reduces the need for virgin copper mining, which is energy-intensive and ecologically damaging.",
+      "recoverable_materials": ["copper", "aluminum", "plastic"],
+      "estimated_co2_saved_kg": 3.2,
+      "repair_feasibility": "Medium",
+      "avg_repair_cost_usd": 15,
+      "avg_replacement_cost_usd": 20,
+      "icon": "🔌"
+    },
+    {
+      "id": "cable",
+      "name": "Cable / Wire",
+      "keywords": ["cable", "wire", "cord", "usb cable", "hdmi", "ethernet", "audio cable", "charging wire", "data cable"],
+      "hazard_level": "Low",
+      "hazard_code": "HW-03",
+      "recommended_action": "Recycle via e-waste drop-off or cable-specific collection bin",
+      "disposal_text": "Cables and cords contain recoverable copper and may have gold-plated connectors. While low-hazard, they should not go into general waste. Bundle and bring to an e-waste or scrap metal recycler.",
+      "safety_notes": [
+        "Inspect for fraying before reuse",
+        "Do not incinerate — burning plastic insulation releases toxic fumes"
+      ],
+      "environmental_note": "Copper is highly recyclable. Recovering copper from cables reduces the environmental footprint of mining and smelting new copper ore.",
+      "recoverable_materials": ["copper", "plastic", "gold"],
+      "estimated_co2_saved_kg": 0.8,
+      "repair_feasibility": "Low",
+      "avg_repair_cost_usd": 5,
+      "avg_replacement_cost_usd": 10,
+      "icon": "🔗"
+    },
+    {
+      "id": "phone",
+      "name": "Smartphone / Tablet",
+      "keywords": ["phone", "smartphone", "mobile", "iphone", "android", "tablet", "ipad", "cell phone", "handset"],
+      "hazard_level": "High",
+      "hazard_code": "HW-04",
+      "recommended_action": "Repair if possible; trade in or donate if functional; recycle via certified e-waste recycler",
+      "disposal_text": "Smartphones and tablets contain lithium batteries, rare earth metals, and hazardous flame retardants. Never dispose in general waste. Use a manufacturer take-back program, certified e-waste recycler, or retailer trade-in scheme.",
+      "safety_notes": [
+        "Wipe personal data before disposal (factory reset)",
+        "Remove and separately recycle the SIM and memory cards",
+        "Do not attempt to remove swollen batteries yourself — take to a professional",
+        "Cracked screens may contain mercury in older LCD backlights"
+      ],
+      "environmental_note": "Manufacturing a single smartphone generates approximately 70 kg of CO₂. Extending device life through repair or refurbishment is the single most impactful action a consumer can take.",
+      "recoverable_materials": ["gold", "silver", "copper", "rare earth metals", "lithium"],
+      "estimated_co2_saved_kg": 70,
+      "repair_feasibility": "High",
+      "avg_repair_cost_usd": 80,
+      "avg_replacement_cost_usd": 300,
+      "icon": "📱"
+    },
+    {
+      "id": "earphones",
+      "name": "Earphones / Headphones",
+      "keywords": ["earphones", "earbuds", "headphones", "headset", "airpods", "wireless earbuds", "in-ear", "over-ear"],
+      "hazard_level": "Medium",
+      "hazard_code": "HW-05",
+      "recommended_action": "Repair if possible; recycle via e-waste drop-off",
+      "disposal_text": "Earphones and headphones contain small lithium batteries (wireless models), copper wiring, and neodymium magnets in drivers. Do not bin — take to an e-waste collection point.",
+      "safety_notes": [
+        "Wireless earbuds contain micro lithium cells — do not crush or puncture",
+        "Do not place in regular recycling bins",
+        "If battery is leaking, handle with gloves"
+      ],
+      "environmental_note": "Neodymium, used in speaker drivers, is a rare earth metal with an environmentally intensive extraction process. Recycling helps reduce demand for new mining.",
+      "recoverable_materials": ["copper", "plastic", "neodymium"],
+      "estimated_co2_saved_kg": 4.5,
+      "repair_feasibility": "Low",
+      "avg_repair_cost_usd": 20,
+      "avg_replacement_cost_usd": 40,
+      "icon": "🎧"
+    },
+    {
+      "id": "keyboard_mouse",
+      "name": "Keyboard / Mouse",
+      "keywords": ["keyboard", "mouse", "trackpad", "trackball", "pointing device", "mechanical keyboard", "wireless mouse", "gaming mouse"],
+      "hazard_level": "Low",
+      "hazard_code": "HW-06",
+      "recommended_action": "Donate if functional; recycle via e-waste drop-off",
+      "disposal_text": "Keyboards and mice are low-hazard but should not go into general waste due to their mixed plastic and metal content. Take to an e-waste collection point or donate to a community reuse scheme.",
+      "safety_notes": [
+        "Remove batteries from wireless devices before disposal",
+        "Do not place in household recycling"
+      ],
+      "environmental_note": "The aluminum and steel components in keyboards and mice are highly recyclable and can be recovered with low energy input compared to primary production.",
+      "recoverable_materials": ["copper", "aluminum", "plastic", "steel"],
+      "estimated_co2_saved_kg": 6,
+      "repair_feasibility": "Medium",
+      "avg_repair_cost_usd": 20,
+      "avg_replacement_cost_usd": 50,
+      "icon": "⌨️"
+    },
+    {
+      "id": "small_appliance",
+      "name": "Small Appliance",
+      "keywords": ["toaster", "hair dryer", "blender", "iron", "shaver", "electric razor", "kettle", "microwave", "fan", "clock", "radio", "speaker", "small appliance", "gadget"],
+      "hazard_level": "Medium",
+      "hazard_code": "HW-07",
+      "recommended_action": "Repair if possible; donate if functional; recycle via municipal e-waste collection",
+      "disposal_text": "Small appliances contain a mix of metals, plastics, and sometimes hazardous components such as heating elements and capacitors. Do not place in general waste. Take to a municipal e-waste collection event or authorized recycler.",
+      "safety_notes": [
+        "Unplug completely and allow to cool before handling",
+        "Do not attempt to repair mains-connected appliances unless qualified",
+        "Microwaves contain high-voltage capacitors — professional disassembly only"
+      ],
+      "environmental_note": "Small appliances are one of the fastest-growing e-waste streams globally. Repair and reuse are strongly preferred over recycling to maximise resource value.",
+      "recoverable_materials": ["copper", "steel", "aluminum", "plastic"],
+      "estimated_co2_saved_kg": 15,
+      "repair_feasibility": "Medium",
+      "avg_repair_cost_usd": 30,
+      "avg_replacement_cost_usd": 60,
+      "icon": "🍞"
+    },
+    {
+      "id": "laptop",
+      "name": "Laptop / Notebook",
+      "keywords": ["laptop", "notebook", "ultrabook", "macbook", "chromebook", "netbook", "computer", "pc"],
+      "hazard_level": "High",
+      "hazard_code": "HW-08",
+      "recommended_action": "Repair or upgrade if possible; donate or trade in if functional; recycle via certified e-waste recycler",
+      "disposal_text": "Laptops contain lithium batteries, rare earth metals, flame-retardant circuit boards, and mercury in older screens. Never dispose in general waste. Use a manufacturer take-back program or certified e-waste recycler. Ensure data is wiped before disposal.",
+      "safety_notes": [
+        "Perform a secure data wipe or physical drive destruction before disposal",
+        "Do not remove the internal battery unless trained — risk of puncture and fire",
+        "Older LCD screens may contain mercury — do not break",
+        "Handle swollen batteries with extreme caution"
+      ],
+      "environmental_note": "A laptop's manufacturing phase accounts for roughly 80% of its lifetime carbon footprint. Extending a laptop's useful life by even two years can halve its effective CO₂ per year of use.",
+      "recoverable_materials": ["gold", "silver", "copper", "aluminum", "lithium", "rare earth metals"],
+      "estimated_co2_saved_kg": 300,
+      "repair_feasibility": "High",
+      "avg_repair_cost_usd": 150,
+      "avg_replacement_cost_usd": 600,
+      "icon": "💻"
+    },
+    {
+      "id": "tv_monitor",
+      "name": "TV / Monitor",
+      "keywords": ["tv", "television", "monitor", "screen", "display", "lcd", "led", "oled", "crt", "flat screen"],
+      "hazard_level": "High",
+      "hazard_code": "HW-09",
+      "recommended_action": "Donate if functional; recycle via authorized e-waste recycler — do not place at kerbside",
+      "disposal_text": "Televisions and monitors contain hazardous materials including lead solder, mercury (LCD backlights), and flame-retardant plastics. CRT televisions contain significant amounts of lead in the glass. All screens must be taken to an authorized e-waste recycler — never placed in general waste or kerbside collection.",
+      "safety_notes": [
+        "Do not break the screen — LCD panels may contain mercury",
+        "CRT screens contain up to 4 kg of lead — never smash or cut",
+        "Large screens require two people to move safely",
+        "Do not leave at unauthorized roadside dumps"
+      ],
+      "environmental_note": "Indium, used in LCD and OLED displays, is one of the rarest elements on Earth. Recovering indium from screens is critical as natural reserves are projected to be depleted within decades.",
+      "recoverable_materials": ["copper", "aluminum", "glass", "rare earth metals", "indium"],
+      "estimated_co2_saved_kg": 200,
+      "repair_feasibility": "Medium",
+      "avg_repair_cost_usd": 100,
+      "avg_replacement_cost_usd": 400,
+      "icon": "🖥️"
+    },
+    {
+      "id": "printer",
+      "name": "Printer / Scanner",
+      "keywords": ["printer", "scanner", "fax", "copier", "inkjet", "laser printer", "all-in-one", "multifunction"],
+      "hazard_level": "Medium",
+      "hazard_code": "HW-10",
+      "recommended_action": "Donate if functional; recycle via manufacturer take-back or authorized e-waste recycler",
+      "disposal_text": "Printers contain ink or toner (which can be toxic), circuit boards, motors, and plastic casings. Remove and separately recycle any remaining ink or toner cartridges. Take the device to an authorized e-waste recycler or manufacturer take-back point.",
+      "safety_notes": [
+        "Remove ink/toner cartridges before disposal and recycle them separately",
+        "Laser toner powder is a respiratory irritant — avoid inhaling",
+        "Do not place in general recycling"
+      ],
+      "environmental_note": "Printer toner cartridges contain microplastics and chemical pigments. Many manufacturers offer dedicated cartridge take-back programmes — use them before disposing of the printer.",
+      "recoverable_materials": ["copper", "aluminum", "plastic", "steel"],
+      "estimated_co2_saved_kg": 25,
+      "repair_feasibility": "Medium",
+      "avg_repair_cost_usd": 60,
+      "avg_replacement_cost_usd": 120,
+      "icon": "🖨️"
+    },
+    {
+      "id": "non_ewaste",
+      "name": "Non-E-Waste Item",
+      "keywords": ["paper", "cardboard", "plastic bag", "glass bottle", "food waste", "organic waste", "newspaper", "magazine"],
+      "hazard_level": "Low",
+      "hazard_code": "N/A",
+      "recommended_action": "Standard Recycling or Composting",
+      "disposal_text": "This item does not qualify as e-waste. Please use your local municipal recycling or composting program.",
+      "safety_notes": [
+        "No special handling required"
+      ],
+      "environmental_note": "Diverting this item from landfill through standard recycling still helps reduce environmental impact.",
+      "recoverable_materials": [],
+      "estimated_co2_saved_kg": 0,
+      "repair_feasibility": "N/A",
+      "avg_repair_cost_usd": 0,
+      "avg_replacement_cost_usd": 0,
+      "icon": "♻️"
+    }
+  ],
+  "co2_comparisons": {
+    "km_per_kg_co2": 6.2,
+    "trees_per_kg_co2_per_year": 0.05,
+    "phone_charges_per_kg_co2": 120
+  },
+  "disposal_channels": [
+    {
+      "name": "Authorized E-Waste Recycler",
+      "description": "Certified processors that safely dismantle and recover materials from e-waste using environmentally sound methods. They are licensed to handle hazardous components and ensure maximum material recovery.",
+      "accepts": "All e-waste categories",
+      "icon": "🏭"
+    },
+    {
+      "name": "Manufacturer Take-Back Program",
+      "description": "Brand-run schemes operated by manufacturers such as Apple, Samsung, Dell, and HP for their own products. Programs often offer trade-in credits, free recycling, or certified data destruction.",
+      "accepts": "Brand-specific devices",
+      "icon": "🏷️"
+    },
+    {
+      "name": "Retailer Drop-Box",
+      "description": "In-store collection bins available at electronics retailers and some supermarkets. Convenient for small items and batteries — no appointment needed.",
+      "accepts": "Small consumer electronics and batteries",
+      "icon": "🛒"
+    },
+    {
+      "name": "Municipal Collection Drive",
+      "description": "City or council-organized periodic collection events that accept a wide variety of household e-waste. Typically free of charge for residents and held at community centres or car parks.",
+      "accepts": "Wide variety of household e-waste",
+      "icon": "🏛️"
+    },
+    {
+      "name": "Repair Café / Local Shop",
+      "description": "Community repair workshops and local repair shops that fix electronics, extending device lifespan and keeping items out of the waste stream entirely. Often low-cost or donation-based.",
+      "accepts": "Repairable electronics",
+      "icon": "🔧"
+    }
+  ]
+}
